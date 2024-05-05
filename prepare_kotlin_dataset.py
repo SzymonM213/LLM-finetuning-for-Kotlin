@@ -83,7 +83,7 @@ def merge_files(directory=KOTLIN_DIR, output_file=os.path.join(DATASET_DIR, "kot
 
     with open(output_file, 'r') as f:
         lines = f.readlines()[:TRAINING_SIZE]
-        with open(f"kotlin_{TRAINING_SIZE}.txt", 'w') as out:
+        with open(os.path.join(DATASET_DIR, f"kotlin_{TRAINING_SIZE}.txt"), 'w') as out:
             out.writelines(lines)
 
 if __name__ == "__main__":
