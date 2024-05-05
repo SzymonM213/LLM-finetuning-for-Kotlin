@@ -1,0 +1,100 @@
+    private fun createThisValueForDelegate(thisClass: ClassDescriptor?, ktDelegate: KtPropertyDelegate): IntermediateValue? =
+    fun floatArrayLoop(): Double {
+    fun filter() {
+        fun findSimplePackageInSymbols(fqName: String): SimpleSymbolBasedPackage? {
+    fun appendExpression(expression: KtExpression?): BuilderByPattern<TElement> {
+    fun readUByte(): UByte =
+    override fun createPointer(): KtSymbolPointer<KtSymbol> = withValidityAssertion {
+    private fun IrClass.isOwnMagicPropertyAdded(): Boolean {
+        override fun toString(): String =
+    abstract fun referenceClass(declaration: Class): IrClassSymbol
+public actual fun ShortArray.sort(): Unit {
+fun assign(condition: Boolean): Unit = when {
+        if (jsTypeOf(a) == "function") a(receiver, completion)
+    override fun containsKey(key: A): Boolean = false
+    fun createSnapshot(keepMutable: Boolean): FirTowerDataElement =
+fun syntheticVisibility(originalDescriptor: DeclarationDescriptorWithVisibility, isUsedForExtension: Boolean): DescriptorVisibility {
+                    function.owner.name.asString() == "toInt"
+    operator fun getValue(thisRef: Any?, prop: Any?) =
+fun case_4(value_1: String, value_2: String, value_3: String) {
+    <!JS_NAME_CLASH!>@JsName("foo") fun bar()<!> = 42
+internal suspend fun Project.findCInteropCommonizerGroup(dependent: CInteropCommonizerDependent): CInteropCommonizerGroup? {
+fun box(): String {
+fun <A: Boolean?, B: Double> eqBooleanQDouble(a: A, b: B) = a == b
+    fun processClassifiersByNameWithSubstitutionFromBothLevelsConditionally(
+fun main() {
+        <!DEBUG_INFO_EXPRESSION_TYPE("T & T & Any")!>x<!>.funNullableT()
+fun KtStringTemplateExpression.getContentRange(): TextRange {
+    override fun withContainingRegularClass(firClass: FirRegularClass, action: () -> Unit) {
+fun test_3(x: IBase) {
+    val result1 = function1.invoke(Foo("+argument+"), 42)
+    fun shouldReadEmptyLine() {
+fun <T> test2(x: Outer<!TYPE_ARGUMENTS_FOR_OUTER_CLASS_WHEN_NESTED_REFERENCED!><T><!>.NestedAlias) = <!DEBUG_INFO_ELEMENT_WITH_ERROR_TYPE!>x<!>
+    override fun directlyFromZip(zipFileSystem: FileSystem): MetadataKotlinLibraryLayout =
+    private fun generateField(field: IrField) {
+    fun <T> getNoDefault(key: Key<T>): T? =
+    actual fun stringToKotlinBenchmark() {
+fun builder(c: suspend () -> Unit) {
+    override fun createTypeVariableForCallableReferenceReturnType(): TypeVariableMarker {
+            <!DEBUG_INFO_EXPRESSION_TYPE("T & Any")!>it<!>.funT()
+            <!DEBUG_INFO_EXPRESSION_TYPE("T & Any")!>it<!>.funAny()
+    override fun equals(other: Any?) = typeEquals(other)
+    private fun AbstractInsnNode.isEliminatedByPop2() =
+        return translateFunctionCall(context, resolvedCall.functionCall, inlineCall, newExplicitReceivers)
+    public fun add(element: T): Unit
+    abstract fun bar()
+    if (functionName == "div" || functionName == "rem") {
+inline fun inlineFun(): String {
+    fun foo()
+    override fun bar(): X<String> = X("K")
+    public fun compileJvm(
+    fun testRequireKotlinInNestedClassesJs() = muteForK2 {
+    fun testNoNullCheckForPassedParameters() = validateBytecode(
+    fun foo(): IQ
+    override fun visitErrorProperty(errorProperty: FirErrorProperty, data: T) {
+fun foo(): Int {
+    private fun collectClassCategories(classCursor: CValue<CXCursor>, className: String): List<CValue<CXCursor>> {
+fun ff() {
+    fun put(key: K, value: D, oldValue: D?): S {
+    fun <T> log(value: T) {
+fun test(box: Box<in String>) {
+fun test4() {
+                    open class Base {
+        if (name != null && functionDescriptor.name != name) return false
+        <!DEBUG_INFO_EXPRESSION_TYPE("InterfaceWithTwoTypeParameters<in T, in T>? & InterfaceWithTwoTypeParameters<in T, in T>")!>x<!>.funT()
+    override fun visit(x: JsObjectLiteral, ctx: JsContext<JsNode>) = false
+fun case_12(x: Any?, z: Any, b: Boolean?) {
+    override fun <D> transformContextReceivers(transformer: FirTransformer<D>, data: D): FirPropertyImpl {
+fun test() {
+        override fun asString() = name + desc
+fun box(): String {
+fun test() {
+fun box(): String {
+fun box(): String {
+internal fun test(x: Int, y: Int): Int {
+            firDeclaration to fun(phase: FirResolvePhase) {
+    fun isDefaultConstructor(): Boolean =
+    open fun foo(): Int {
+    override fun configureTest(builder: TestConfigurationBuilder, disposable: Disposable) {
+fun box(): String {
+infix fun Int.foo(i: Int) {
+    override fun getDeclaredEnumEntry(symbol: IrEnumEntrySymbol): IrEnumEntrySymbol = enumEntries.getDeclared(symbol)
+internal fun doNothingNoInline(a: Int): Int {
+inline fun foo(): DemoInterface {
+public fun BooleanArray.reverse(): Unit {
+fun box(): String {
+    fun `test - configure js compilation`() {
+    <!DEBUG_INFO_EXPRESSION_TYPE("kotlin.collections.MutableCollection<out kotlin.Nothing?>? & kotlin.collections.MutableCollection<out kotlin.Nothing?>")!>x<!>.funT()
+fun box(): String {
+fun box(): String {
+            override fun appendAfterValueParameter(
+        fun accept(name: String, actualJvmSignature: String, actualGenericSignature: String) {
+fun doIf(s: String?) =
+fun box(): String {
+        fun nameWithFlavorIfNeeded(name: String) = if (useFlavors) "flavor1${
+fun notNullToNullI(aa: Any) = aa as? II?
+        override fun toString(): String = fileObject.name
+fun box(): String {
+    override fun registerProjectModelServices(project: MockProject, testServices: TestServices) {
+    actual abstract fun foo()
+        operator fun invoke(

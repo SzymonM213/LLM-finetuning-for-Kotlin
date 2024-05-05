@@ -1,0 +1,97 @@
+def debug(user, message):
+def success(user, message):
+def process_response(self, request, response):
+def table(name, auth=None, eager=True):
+def api_request(methods=None, require_token=True):
+def get_tweets(user, pages=<NUM_LIT>):
+def add_deformation(chn_names, data):
+def get_leaves(self):
+def get_node(self, label):
+def get_leaf_names(self):
+@classmethod<EOL><INDENT>def create(cls, name=None, length=None, descendants=None, **kw):<DEDENT>
+@property<EOL><INDENT>def newick(self):<DEDENT>
+def loads(s, strip_comments=False, **kw):
+def visit(self, visitor, predicate=None, **kw):
+def ascii_art(self, strict=False, show_internal=True):
+def close(self):
+def settimeout(self, timeout):
+def recv(self, buffer_size):
+async def read(self, buffer_size):
+def write(self, msg):
+async def wait_for(self, cmd, value=None, timeout=<NUM_LIT>):
+async def connect(self):
+async def send(self, commands):
+def close(self):
+def logger(function):
+def autofocus_scan(self):
+def close(self):
+def give_another_quote(q):
+def find_by(self, **params):
+def _get_entity_from_href(self, result):
+def query_string(self, **params):
+@main.command('<STR_LIT>')<EOL>@click.argument('<STR_LIT>')<EOL>@click.argument('<STR_LIT>')<EOL>def init(section, remote_file):
+@register.simple_tag<EOL>def djfrontend_twbs_theme_css(version=None):
+@register.simple_tag<EOL>def djfrontend_jquery(version=None):
+@register.simple_tag<EOL>def djfrontend_twbs_js(version=None, files=None):
+def search(self, **kwargs):
+def getRestaurantDetails(self, restaurant_id):
+def getEstablishments(self, city_id, **kwargs):
+def parse(self):
+def __get_event_fields(self):
+@classmethod<EOL><INDENT>def has_resuming(cls):<DEDENT>
+def get_items(self, category=CATEGORY_EVENT, offset=REMO_DEFAULT_OFFSET):
+def metadata(self, item, filter_classified=False):
+@classmethod<EOL><INDENT>def has_archiving(cls):<DEDENT>
+def fetch_items(self, category, **kwargs):
+@classmethod<EOL><INDENT>def setup_cmd_parser(cls):<DEDENT>
+def crates(self, from_page=<NUM_LIT:1>):
+@classmethod<EOL><INDENT>def has_resuming(cls):<DEDENT>
+def fetch(self, url, payload=None):
+def __fetch_items(self, path, page=<NUM_LIT:1>):
+def _init_client(self, from_archive=False):
+@staticmethod<EOL><INDENT>def metadata_category(item):<DEDENT>
+@classmethod<EOL><INDENT>def setup_cmd_parser(cls):<DEDENT>
+def fetch(self, category=CATEGORY_CRATES, from_date=DEFAULT_DATETIME):
+def summary(self):
+def get_question_answers(self, question_id):
+def get_questions(self, offset=None):
+def _init_client(self, from_archive=False):
+def metadata(self, item, filter_classified=False):
+def get_token_from_post_data(self, data):
+def get_authorization_code_from_uri(self, uri):
+def _invalid_redirect_uri_response(self):
+def get_token(self,<EOL>grant_type,<EOL>client_id,<EOL>client_secret,<EOL>redirect_uri,<EOL>code,<EOL>**params):
+@property<EOL><INDENT>def token_length(self):<DEDENT>
+def _handle_exception(self, exc):
+def get_token(self, code, **params):
+def url_query_params(url):
+def setUp(self):
+def setUp(self):
+def jsonFrom(fname):
+def remove(self, name):
+def setUp(self):
+def setUp(self):
+def setContent(self, content):
+def request(self, method, url, headers, body):
+def getArgs(self):
+def checker(location, receiver):
+def messages(location, receiver):
+def check(self):
+def markBad(self, dummyValue):
+def markGood(self, dummyValue):
+def makeService(opt):
+def run(restarter, checker):
+def runProcess(args, timeout, grace, reactor):
+def processExited(self, reason):
+def childConnectionLost(self, reason):
+def replaceEnvironment(case, myEnv=None):
+def maybeAddHeart(master):
+def message(self, contents):
+def remove(self, name):
+@mainlib.COMMANDS.register(name='<STR_LIT>')<EOL>def main(argv):
+def restart(places, name):
+def makeService(opt):
+def run(restarter, checker, timer):
+def parseConfig(opt):
+def hash_eth2(data: Union[bytes, bytearray]) -> Hash32:
+def create_access_request(pid_value, users, confirmed):

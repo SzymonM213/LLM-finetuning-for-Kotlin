@@ -1,0 +1,1024 @@
+enum class En {
+    A,
+    B
+}
+
+fun box(): String {
+    when(En.A) {
+        En.A -> "s1"
+        En.B -> "s2"
+    }
+    return "OK"
+}
+/*
+ * Copyright 2010-2015 JetBrains s.r.o.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package org.jetbrains.kotlin.container
+
+import java.io.Closeable
+import java.io.PrintStream
+import java.lang.reflect.ParameterizedType
+import java.lang.reflect.Type
+import java.lang.reflect.WildcardType
+
+class ContainerConsistencyException(message: String) : Exception(message)
+
+interface ComponentContainer {
+    val containerId: String
+
+    fun createResolveContext(requestingDescriptor: ValueDescriptor): ValueResolveContext
+}
+
+interface ComponentProvider {
+    fun resolve(request: Type): ValueDescriptor?
+    fun <T> create(request: Class<T>): T
+}
+
+object DynamicComponentDescriptor : ValueDescriptor {
+    override fun getValue(): Any = throw UnsupportedOperationException()
+    override fun toString(): String = "Dynamic"
+}
+
+class StorageComponentContainer(
+    private val id: String,
+    parent: StorageComponentContainer? = null
+) : ComponentContainer, ComponentProvider, Closeable {
+    val unknownContext: ComponentResolveContext by lazy {
+        val parentContext = parent?.let { ComponentResolveContext(it, DynamicComponentDescriptor) }
+        ComponentResolveContext(this, DynamicComponentDescriptor, parentContext)
+    }
+    private val componentStorage: ComponentStorage = ComponentStorage(id, parent?.componentStorage)
+
+    override fun createResolveContext(requestingDescriptor: ValueDescriptor): ValueResolveContext {
+        if (requestingDescriptor == DynamicComponentDescriptor) // cache unknown component descriptor
+            return unknownContext
+        return ComponentResolveContext(this, requestingDescriptor)
+    }
+
+    fun compose(): StorageComponentContainer {
+        componentStorage.compose(unknownContext)
+        return this
+    }
+
+    fun dump(printer: PrintStream) {
+        componentStorage.dump(printer)
+    }
+
+    override fun close() = componentStorage.dispose()
+
+    fun resolve(request: Type, context: ValueResolveContext): ValueDescriptor? {
+        return componentStorage.resolve(request, context) ?: resolveIterable(request, context)
+    }
+
+    override fun resolve(request: Type): ValueDescriptor? {
+        return resolve(request, unknownContext)
+    }
+
+    private fun resolveIterable(request: Type, context: ValueResolveContext): ValueDescriptor? {
+        if (request !is ParameterizedType) return null
+        val rawType = request.rawType
+        if (rawType != Iterable::class.java) return null
+        val typeArguments = request.actualTypeArguments
+        if (typeArguments.size != 1) return null
+        val iterableTypeArgument = typeArguments[0]
+        val iterableType = when (iterableTypeArgument) {
+            is WildcardType -> {
+                val upperBounds = iterableTypeArgument.upperBounds
+                if (upperBounds.size != 1) return null
+                upperBounds[0]
+            }
+            is Class<*> -> iterableTypeArgument
+            is ParameterizedType -> iterableTypeArgument
+            else -> return null
+        }
+        return IterableDescriptor(componentStorage.resolveMultiple(iterableType, context))
+    }
+
+    fun resolveMultiple(request: Class<*>, context: ValueResolveContext = unknownContext): Iterable<ValueDescriptor> {
+        return componentStorage.resolveMultiple(request, context)
+    }
+
+    internal fun registerDescriptors(descriptors: List<ComponentDescriptor>): StorageComponentContainer {
+        componentStorage.registerDescriptors(unknownContext, descriptors)
+        return this
+    }
+
+    internal fun registerClashResolvers(resolvers: List<PlatformExtensionsClashResolver<*>>): StorageComponentContainer {
+        componentStorage.registerClashResolvers(resolvers)
+        return this
+    }
+
+    override fun <T> create(request: Class<T>): T {
+        val constructorBinding = request.bindToConstructor(containerId, unknownContext)
+        val args = constructorBinding.argumentDescriptors.map { it.getValue() }.toTypedArray()
+        return runWithUnwrappingInvocationException {
+            @Suppress("UNCHECKED_CAST")
+            constructorBinding.constructor.newInstance(*args) as T
+        }
+    }
+
+    override val containerId
+        get() = "Container: $id"
+
+    override fun toString() = containerId
+}
+
+fun StorageComponentContainer.registerSingleton(klass: Class<*>): StorageComponentContainer {
+    return registerDescriptors(listOf(SingletonTypeComponentDescriptor(this, klass)))
+}
+
+fun StorageComponentContainer.registerInstance(instance: Any): StorageComponentContainer {
+    return registerDescriptors(listOf(InstanceComponentDescriptor(instance)))
+}
+
+inline fun <reified T : Any> StorageComponentContainer.resolve(context: ValueResolveContext = unknownContext): ValueDescriptor? {
+    return resolve(T::class.java, context)
+}
+
+inline fun <reified T : Any> StorageComponentContainer.resolveMultiple(context: ValueResolveContext = unknownContext): Iterable<ValueDescriptor> {
+    return resolveMultiple(T::class.java, context)
+}
+
+fun test() {
+    if
+
+    if (other) {
+    }
+}
+/*
+ * Copyright 2010-2024 JetBrains s.r.o. and Kotlin Programming Language contributors.
+ * Use of this source code is governed by the Apache 2.0 license that can be found in the license/LICENSE.txt file.
+ */
+
+// This file was generated automatically. See compiler/fir/tree/tree-generator/Readme.md.
+// DO NOT MODIFY IT MANUALLY.
+
+package org.jetbrains.kotlin.fir.types
+
+import org.jetbrains.kotlin.KtSourceElement
+import org.jetbrains.kotlin.fir.FirAnnotationContainer
+import org.jetbrains.kotlin.fir.FirElement
+import org.jetbrains.kotlin.fir.FirPureAbstractElement
+import org.jetbrains.kotlin.fir.expressions.FirAnnotation
+import org.jetbrains.kotlin.fir.visitors.FirTransformer
+import org.jetbrains.kotlin.fir.visitors.FirVisitor
+
+/**
+ * Generated from: [org.jetbrains.kotlin.fir.tree.generator.FirTreeBuilder.typeRef]
+ */
+sealed class FirTypeRef : FirPureAbstractElement(), FirAnnotationContainer {
+    abstract override val source: KtSourceElement?
+    abstract override val annotations: List<FirAnnotation>
+
+    override fun <R, D> accept(visitor: FirVisitor<R, D>, data: D): R =
+        visitor.visitTypeRef(this, data)
+
+    @Suppress("UNCHECKED_CAST")
+    override fun <E : FirElement, D> transform(transformer: FirTransformer<D>, data: D): E =
+        transformer.transformTypeRef(this, data) as E
+
+    abstract override fun replaceAnnotations(newAnnotations: List<FirAnnotation>)
+
+    abstract override fun <D> transformAnnotations(transformer: FirTransformer<D>, data: D): FirTypeRef
+}
+
+/*
+ * Copyright 2010-2022 JetBrains s.r.o. and Kotlin Programming Language contributors.
+ * Use of this source code is governed by the Apache 2.0 license that can be found in the license/LICENSE.txt file.
+ */
+
+package org.jetbrains.kotlin.samWithReceiver
+
+import org.jetbrains.kotlin.descriptors.ClassDescriptor
+import org.jetbrains.kotlin.descriptors.FunctionDescriptor
+import org.jetbrains.kotlin.extensions.AnnotationBasedExtension
+import org.jetbrains.kotlin.resolve.sam.SamWithReceiverResolver
+import org.jetbrains.kotlin.psi.KtModifierListOwner
+
+class SamWithReceiverResolverExtension(
+    private val annotations: List<String>
+) : SamWithReceiverResolver, AnnotationBasedExtension {
+    override fun getAnnotationFqNames(modifierListOwner: KtModifierListOwner?) = annotations
+
+    override fun shouldConvertFirstSamParameterToReceiver(function: FunctionDescriptor): Boolean {
+        return (function.containingDeclaration as? ClassDescriptor)?.hasSpecialAnnotation(null) ?: false
+    }
+}
+
+@kotlin.SinceKotlin(version = "1.3")
+@kotlin.internal.InlineOnly
+public val coroutineContext: kotlin.coroutines.CoroutineContext { get; }
+
+@kotlin.SinceKotlin(version = "1.3")
+@kotlin.internal.InlineOnly
+public inline fun <T> Continuation(context: kotlin.coroutines.CoroutineContext, crossinline resumeWith: (kotlin.Result<T>) -> kotlin.Unit): kotlin.coroutines.Continuation<T>
+
+@kotlin.SinceKotlin(version = "1.3")
+@kotlin.internal.InlineOnly
+public suspend inline fun <T> suspendCoroutine(crossinline block: (kotlin.coroutines.Continuation<T>) -> kotlin.Unit): T
+
+@kotlin.SinceKotlin(version = "1.3")
+public fun <T> (suspend () -> T).createCoroutine(completion: kotlin.coroutines.Continuation<T>): kotlin.coroutines.Continuation<kotlin.Unit>
+
+@kotlin.SinceKotlin(version = "1.3")
+public fun <R, T> (suspend R.() -> T).createCoroutine(receiver: R, completion: kotlin.coroutines.Continuation<T>): kotlin.coroutines.Continuation<kotlin.Unit>
+
+@kotlin.SinceKotlin(version = "1.3")
+@kotlin.ExperimentalStdlibApi
+public fun <E : kotlin.coroutines.CoroutineContext.Element> kotlin.coroutines.CoroutineContext.Element.getPolymorphicElement(key: kotlin.coroutines.CoroutineContext.Key<E>): E?
+
+@kotlin.SinceKotlin(version = "1.3")
+@kotlin.ExperimentalStdlibApi
+public fun kotlin.coroutines.CoroutineContext.Element.minusPolymorphicKey(key: kotlin.coroutines.CoroutineContext.Key<*>): kotlin.coroutines.CoroutineContext
+
+@kotlin.SinceKotlin(version = "1.3")
+@kotlin.internal.InlineOnly
+public inline fun <T> kotlin.coroutines.Continuation<T>.resume(value: T): kotlin.Unit
+
+@kotlin.SinceKotlin(version = "1.3")
+@kotlin.internal.InlineOnly
+public inline fun <T> kotlin.coroutines.Continuation<T>.resumeWithException(exception: kotlin.Throwable): kotlin.Unit
+
+@kotlin.SinceKotlin(version = "1.3")
+public fun <T> (suspend () -> T).startCoroutine(completion: kotlin.coroutines.Continuation<T>): kotlin.Unit
+
+@kotlin.SinceKotlin(version = "1.3")
+public fun <R, T> (suspend R.() -> T).startCoroutine(receiver: R, completion: kotlin.coroutines.Continuation<T>): kotlin.Unit
+
+@kotlin.SinceKotlin(version = "1.3")
+public abstract class AbstractCoroutineContextElement : kotlin.coroutines.CoroutineContext.Element {
+    public constructor AbstractCoroutineContextElement(key: kotlin.coroutines.CoroutineContext.Key<*>)
+
+    public open override val key: kotlin.coroutines.CoroutineContext.Key<*> { get; }
+}
+
+@kotlin.SinceKotlin(version = "1.3")
+@kotlin.ExperimentalStdlibApi
+public abstract class AbstractCoroutineContextKey<B : kotlin.coroutines.CoroutineContext.Element, E : B> : kotlin.coroutines.CoroutineContext.Key<E> {
+    public constructor AbstractCoroutineContextKey<B : kotlin.coroutines.CoroutineContext.Element, E : B>(baseKey: kotlin.coroutines.CoroutineContext.Key<B>, safeCast: (element: kotlin.coroutines.CoroutineContext.Element) -> E?)
+}
+
+@kotlin.SinceKotlin(version = "1.3")
+public interface Continuation<in T> {
+    public abstract val context: kotlin.coroutines.CoroutineContext { get; }
+
+    public abstract fun resumeWith(result: kotlin.Result<T>): kotlin.Unit
+}
+
+@kotlin.SinceKotlin(version = "1.3")
+public interface ContinuationInterceptor : kotlin.coroutines.CoroutineContext.Element {
+    public open override operator fun <E : kotlin.coroutines.CoroutineContext.Element> get(key: kotlin.coroutines.CoroutineContext.Key<E>): E?
+
+    public abstract fun <T> interceptContinuation(continuation: kotlin.coroutines.Continuation<T>): kotlin.coroutines.Continuation<T>
+
+    public open override fun minusKey(key: kotlin.coroutines.CoroutineContext.Key<*>): kotlin.coroutines.CoroutineContext
+
+    public open fun releaseInterceptedContinuation(continuation: kotlin.coroutines.Continuation<*>): kotlin.Unit
+
+    public companion object of ContinuationInterceptor Key : kotlin.coroutines.CoroutineContext.Key<kotlin.coroutines.ContinuationInterceptor> {
+    }
+}
+
+@kotlin.SinceKotlin(version = "1.3")
+public interface CoroutineContext {
+    public abstract fun <R> fold(initial: R, operation: (R, kotlin.coroutines.CoroutineContext.Element) -> R): R
+
+    public abstract operator fun <E : kotlin.coroutines.CoroutineContext.Element> get(key: kotlin.coroutines.CoroutineContext.Key<E>): E?
+
+    public abstract fun minusKey(key: kotlin.coroutines.CoroutineContext.Key<*>): kotlin.coroutines.CoroutineContext
+
+    public open operator fun plus(context: kotlin.coroutines.CoroutineContext): kotlin.coroutines.CoroutineContext
+
+    public interface Element : kotlin.coroutines.CoroutineContext {
+        public abstract val key: kotlin.coroutines.CoroutineContext.Key<*> { get; }
+
+        public open override fun <R> fold(initial: R, operation: (R, kotlin.coroutines.CoroutineContext.Element) -> R): R
+
+        public open override operator fun <E : kotlin.coroutines.CoroutineContext.Element> get(key: kotlin.coroutines.CoroutineContext.Key<E>): E?
+
+        public open override fun minusKey(key: kotlin.coroutines.CoroutineContext.Key<*>): kotlin.coroutines.CoroutineContext
+    }
+
+    public interface Key<E : kotlin.coroutines.CoroutineContext.Element> {
+    }
+}
+
+@kotlin.SinceKotlin(version = "1.3")
+public object EmptyCoroutineContext : kotlin.coroutines.CoroutineContext, kotlin.io.Serializable {
+    public open override fun <R> fold(initial: R, operation: (R, kotlin.coroutines.CoroutineContext.Element) -> R): R
+
+    public open override operator fun <E : kotlin.coroutines.CoroutineContext.Element> get(key: kotlin.coroutines.CoroutineContext.Key<E>): E?
+
+    public open override fun hashCode(): kotlin.Int
+
+    public open override fun minusKey(key: kotlin.coroutines.CoroutineContext.Key<*>): kotlin.coroutines.CoroutineContext
+
+    public open override operator fun plus(context: kotlin.coroutines.CoroutineContext): kotlin.coroutines.CoroutineContext
+
+    public open override fun toString(): kotlin.String
+}
+
+@kotlin.SinceKotlin(version = "1.3")
+@kotlin.annotation.Target(allowedTargets = {AnnotationTarget.CLASS})
+@kotlin.annotation.Retention(value = AnnotationRetention.BINARY)
+public final annotation class RestrictsSuspension : kotlin.Annotation {
+    public constructor RestrictsSuspension()
+}
+// !LANGUAGE: +MultiPlatformProjects
+// MODULE: m1-common
+// FILE: common.kt
+
+expect open class A() {
+    fun foo()
+}
+
+open class B : A()
+
+// MODULE: m1-jvm()()(m1-common)
+// FILE: jvm.kt
+
+abstract class X {
+    fun bar() {}
+}
+
+interface Y {
+    fun baz() {}
+}
+
+actual open class A : X(), Y {
+    actual fun foo() {}
+}
+
+class C : B() {
+    fun test() {
+        foo()
+        bar()
+        baz()
+    }
+}
+
+class D : A() {
+    fun test() {
+        foo()
+        bar()
+        baz()
+    }
+}
+
+/*
+ * Copyright 2010-2024 JetBrains s.r.o. and Kotlin Programming Language contributors.
+ * Use of this source code is governed by the Apache 2.0 license that can be found in the license/LICENSE.txt file.
+ */
+
+// This file was generated automatically. See compiler/ir/ir.tree/tree-generator/ReadMe.md.
+// DO NOT MODIFY IT MANUALLY.
+
+package org.jetbrains.kotlin.ir.expressions
+
+import org.jetbrains.kotlin.ir.symbols.IrFunctionSymbol
+import org.jetbrains.kotlin.ir.visitors.IrElementVisitor
+
+/**
+ * Represents a platform-specific low-level reference to a function.
+ *
+ * On the JS platform it represents a plain reference to a JavaScript function.
+ *
+ * On the JVM platform it represents a [java.lang.invoke.MethodHandle] constant.
+ *
+ * Generated from: [org.jetbrains.kotlin.ir.generator.IrTree.rawFunctionReference]
+ */
+abstract class IrRawFunctionReference : IrDeclarationReference() {
+    abstract override var symbol: IrFunctionSymbol
+
+    override fun <R, D> accept(visitor: IrElementVisitor<R, D>, data: D): R =
+        visitor.visitRawFunctionReference(this, data)
+}
+
+// TARGET_BACKEND: JVM
+// MODULE: lib
+// FILE: JavaClass.java
+
+public class JavaClass<T> {
+
+    private T minus0;
+
+    private T plus0;
+
+    JavaClass(T minus0, T plus0)
+    {
+        this.minus0 = minus0;
+        this.plus0 = plus0;
+    }
+
+    public T minus0()
+    {
+        return minus0;
+    }
+
+    public T plus0()
+    {
+        return plus0;
+    }
+
+}
+
+// MODULE: main(lib)
+// FILE: b.kt
+
+fun box(): String {
+    val jClass = JavaClass<Double>(-0.0, 0.0)
+
+    if (jClass.minus0() < jClass.plus0()) return "fail 2"
+    if (jClass.minus0() != jClass.plus0()) return "fail 5"
+
+    return "OK"
+}
+
+/*
+ * Copyright 2010-2015 JetBrains s.r.o.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package org.jetbrains.kotlin.psi.stubs.elements
+
+import com.intellij.psi.stubs.StubElement
+import com.intellij.psi.stubs.StubInputStream
+import com.intellij.psi.stubs.StubOutputStream
+import com.intellij.util.io.StringRef
+import org.jetbrains.annotations.NonNls
+import org.jetbrains.kotlin.psi.KtEnumEntrySuperclassReferenceExpression
+import org.jetbrains.kotlin.psi.stubs.KotlinEnumEntrySuperclassReferenceExpressionStub
+import org.jetbrains.kotlin.psi.stubs.impl.KotlinEnumEntrySuperclassReferenceExpressionStubImpl
+
+class KtEnumEntrySuperClassReferenceExpressionElementType(@NonNls debugName: String) :
+    KtStubElementType<KotlinEnumEntrySuperclassReferenceExpressionStub, KtEnumEntrySuperclassReferenceExpression>(
+        debugName,
+        KtEnumEntrySuperclassReferenceExpression::class.java,
+        KotlinEnumEntrySuperclassReferenceExpressionStub::class.java
+    ) {
+
+    override fun createStub(
+        psi: KtEnumEntrySuperclassReferenceExpression,
+        parentStub: StubElement<*>
+    ): KotlinEnumEntrySuperclassReferenceExpressionStub {
+        return KotlinEnumEntrySuperclassReferenceExpressionStubImpl(parentStub, StringRef.fromString(psi.getReferencedName())!!)
+    }
+
+    override fun serialize(stub: KotlinEnumEntrySuperclassReferenceExpressionStub, dataStream: StubOutputStream) {
+        dataStream.writeName(stub.getReferencedName())
+    }
+
+    override fun deserialize(dataStream: StubInputStream, parentStub: StubElement<*>): KotlinEnumEntrySuperclassReferenceExpressionStub {
+        return KotlinEnumEntrySuperclassReferenceExpressionStubImpl(parentStub, dataStream.readName()!!)
+    }
+}
+
+/*
+ * Copyright 2010-2018 JetBrains s.r.o. and Kotlin Programming Language contributors.
+ * Use of this source code is governed by the Apache 2.0 license that can be found in the license/LICENSE.txt file.
+ */
+
+@file:OptIn(DeprecatedTargetPresetApi::class, InternalKotlinGradlePluginApi::class)
+@file:Suppress("DEPRECATION")
+
+package org.jetbrains.kotlin.generators.gradle.dsl
+
+import org.jetbrains.kotlin.gradle.plugin.*
+import org.gradle.api.Action
+import org.jetbrains.kotlin.gradle.DeprecatedTargetPresetApi
+import org.jetbrains.kotlin.gradle.InternalKotlinGradlePluginApi
+import java.io.File
+
+fun main() {
+    generateKotlinTargetContainerWithPresetFunctionsInterface()
+}
+
+private val parentInterface = KotlinTargetsContainerWithPresets::class
+
+private val presetsProperty = KotlinTargetsContainerWithPresets::presets.name
+
+private fun generateKotlinTargetContainerWithPresetFunctionsInterface() {
+    // Generate KotlinMultiplatformExtension subclass with member functions for the presets:
+    val functions = allPresetEntries.map { kotlinPreset ->
+        generatePresetFunctions(kotlinPreset, presetsProperty, "configureOrCreate")
+    }
+
+    val parentInterfaceName =
+        typeName(parentInterface.java.canonicalName)
+
+    val className =
+        typeName("org.jetbrains.kotlin.gradle.dsl.KotlinTargetContainerWithPresetFunctions")
+
+    val deprecatedMessageVal = typeName("org.jetbrains.kotlin.konan.target.DEPRECATED_TARGET_MESSAGE")
+
+    val imports = allPresetEntries
+        .flatMap { it.typeNames() }
+        .plus(parentInterfaceName)
+        .plus(deprecatedMessageVal)
+        .plus(typeName(Action::class.java.canonicalName))
+        .filter { it.packageName() != className.packageName() }
+        .flatMap { it.collectFqNames() }
+        .toSortedSet()
+        .joinToString("\n") { "import $it" }
+
+    val generatedCodeWarning = "// DO NOT EDIT MANUALLY! Generated by ${object {}.javaClass.enclosingClass.name}"
+
+    val extraTopLevelDeclarations = allPresetEntries.flatMap { it.extraTopLevelDeclarations }.joinToString("\n")
+
+    val code = listOf(
+        "package ${className.packageName()}",
+        imports,
+        generatedCodeWarning,
+        extraTopLevelDeclarations,
+        "@KotlinGradlePluginDsl\ninterface ${className.renderShort()} : ${parentInterfaceName.renderShort()} {",
+        functions.joinToString("\n\n") { it.indented(4) },
+        "}"
+    ).joinToString("\n\n")
+
+    val targetFile = File("$outputSourceRoot/${className.fqName.replace(".", "/")}.kt")
+    targetFile.writeText(code)
+}
+
+private fun generatePresetFunctions(
+    presetEntry: KotlinPresetEntry,
+    getPresetsExpression: String,
+    configureOrCreateFunctionName: String,
+): String {
+    fun deprecated(replaceWithArguments: List<String>? = null): String {
+        val deprecation = presetEntry.deprecation ?: return ""
+
+        val deprecationAnnotation = if (deprecation.replaceWithOtherPreset != null && replaceWithArguments != null) {
+            val replaceWith = "ReplaceWith(\"${deprecation.replaceWithOtherPreset}(${replaceWithArguments.joinToString(",")})\")"
+            "@Deprecated(${deprecation.message}, level = DeprecationLevel.${deprecation.level.name}, replaceWith = $replaceWith)"
+        } else {
+            "@Deprecated(${deprecation.message}, level = DeprecationLevel.${deprecation.level.name})"
+        }
+
+        // magic indent is needed to make the result look pretty
+        return "\n    $deprecationAnnotation\n    "
+    }
+
+    val suppress = if (presetEntry.deprecation != null) {
+        val suppressDeprecationId = when (presetEntry.deprecation.level) {
+            DeprecationLevel.WARNING -> "DEPRECATION"
+            DeprecationLevel.ERROR -> "DEPRECATION_ERROR"
+            DeprecationLevel.HIDDEN -> "DEPRECATION_HIDDEN"
+        }
+        "@Suppress(\"$suppressDeprecationId\")\n    "
+    } else {
+        ""
+    }
+
+    // Suppress presets deprecation to prevent warnings inside kotlin-gradle-plugin
+    val suppressPresetsDeprecation = "@Suppress(\"DEPRECATION\")"
+
+    val alsoBlockAfterConfiguration = if (presetEntry.alsoBlockAfterConfiguration != null) {
+        """
+            .also {
+                ${presetEntry.alsoBlockAfterConfiguration.indented(16, skipFirstLine = true)}
+            }
+        """.trimIndent().indented(8, skipFirstLine = true)
+    } else {
+        ""
+    }
+
+    val presetName = presetEntry.presetName
+    val entityName = presetEntry.entityName
+
+    return """
+    ${deprecated()}fun $presetName(
+        name: String = "$entityName",
+        configure: ${presetEntry.targetType.renderShort()}.() -> Unit = { }
+    ): ${presetEntry.targetType.renderShort()} =
+        $configureOrCreateFunctionName(
+            name,
+            ${suppressPresetsDeprecation}
+            $getPresetsExpression.getByName("$entityName") as ${presetEntry.presetType.renderShort()},
+            configure
+        )$alsoBlockAfterConfiguration
+
+    ${deprecated(emptyList())}${suppress}fun $presetName() = $presetName("$entityName") { }
+    ${deprecated(listOf("name"))}${suppress}fun $presetName(name: String) = $presetName(name) { }
+    ${deprecated()}${suppress}fun $presetName(name: String, configure: Action<${presetEntry.targetType.renderShort()}>) = $presetName(name) { configure.execute(this) }
+    ${deprecated()}${suppress}fun $presetName(configure: Action<${presetEntry.targetType.renderShort()}>) = $presetName { configure.execute(this) }
+""".trimIndent()
+}
+
+// WITH_STDLIB
+// WITH_COROUTINES
+import helpers.*
+import kotlin.coroutines.*
+
+var result = "FAIL"
+
+fun builder(c: suspend () -> Unit) {
+    c.startCoroutine(handleExceptionContinuation {
+        result = it.message!!
+    })
+}
+
+@Suppress("UNSUPPORTED_FEATURE")
+inline class Result<T>(val a: Any?) {
+    fun getOrThrow(): T = a as T
+}
+
+var c: Continuation<Any>? = null
+
+suspend fun <T> suspendMe(): T = suspendCoroutine {
+    @Suppress("UNCHECKED_CAST")
+    c = it as Continuation<Any>
+}
+
+abstract class ResultReceiver<T> {
+    abstract suspend fun receive(result: Result<T>)
+}
+
+inline fun <T> ResultReceiver(crossinline f: (Result<T>) -> Unit): ResultReceiver<T> =
+    object : ResultReceiver<T>() {
+        override suspend fun receive(result: Result<T>) {
+            f(result)
+        }
+    }
+
+fun test() {
+    var invoked = false
+    val receiver = ResultReceiver<String> { result ->
+        invoked = true
+        result.getOrThrow()
+    }
+
+    builder  {
+        receiver.receive(Result(suspendMe()))
+    }
+    c?.resumeWithException(IllegalStateException("OK"))
+    if (invoked) {
+        throw RuntimeException("Fail")
+    }
+}
+
+fun box(): String {
+    test()
+    return result
+}
+
+fun ff(a: Any) = a is Array<*> && a.isArrayOf<String>()
+/*
+ * Copyright 2010-2018 JetBrains s.r.o. Use of this source code is governed by the Apache 2.0 license
+ * that can be found in the LICENSE file.
+ */
+// WITH_STDLIB
+
+import kotlin.test.*
+
+fun box(): String {
+    val cond = 1
+    if (cond == 2) throw RuntimeException()
+    if (cond == 3) throw NoSuchElementException("no such element")
+    if (cond == 4) throw Error("error happens")
+
+    return "OK"
+}
+
+package org.test
+
+class Outer {
+    @RequiresOptIn
+    @Retention(AnnotationRetention.BINARY)
+    annotation class Nested
+}
+
+@Outer.Nested
+fun foo() {}
+
+// !LANGUAGE: +ProperIeee754Comparisons
+
+val minus: Any = -0.0
+
+fun box(): String {
+    if (minus is Double) {
+        if ((minus as Comparable<Double>) >= 0.0) return "fail 0"
+        if ((minus as Comparable<Double>) == 0.0) return "fail 1"
+        if (minus == (0.0 as Comparable<Double>)) return "fail 2"
+        if (minus == (0.0F as Comparable<Float>)) return "fail 3"
+    }
+    return "OK"
+}
+/*
+ * Copyright 2010-2017 JetBrains s.r.o.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package org.jetbrains.kotlin.incremental.storage
+
+import org.jetbrains.kotlin.name.FqName
+import org.jetbrains.kotlin.resolve.jvm.JvmClassName
+
+internal interface NameTransformer<Name> {
+    fun asString(name: Name): String
+    fun asName(string: String): Name
+    fun asFqName(string: String): FqName
+}
+
+internal object FqNameTransformer : NameTransformer<FqName> {
+    override fun asString(name: FqName): String =
+        name.asString()
+
+    override fun asName(string: String): FqName =
+        FqName(string)
+
+    override fun asFqName(string: String): FqName =
+        asName(string)
+}
+
+internal object JvmClassNameTransformer : NameTransformer<JvmClassName> {
+    override fun asString(name: JvmClassName): String =
+        name.internalName
+
+    override fun asName(string: String): JvmClassName =
+        JvmClassName.byInternalName(string)
+
+    override fun asFqName(string: String): FqName =
+        asName(string).fqNameForClassNameWithoutDollars
+}
+// FILE: K1.kt
+class KSub : J1()
+
+fun main(k: KSub, vString: SuperClass<String>.NestedInSuperClass, vInt: SuperClass<Int>.NestedInSuperClass) {
+    k.getImpl().nestedI(vString)
+
+    // TODO: Support parametrisized inner classes
+    k.getImpl().nestedI(<!ARGUMENT_TYPE_MISMATCH!>vInt<!>)
+    k.getNestedSubClass().nested("")
+    k.getNestedSubClass().nested(<!ARGUMENT_TYPE_MISMATCH!>1<!>)
+}
+
+// FILE: J1.java
+public class J1 extends KFirst {
+
+    public class NestedSubClass extends NestedInSuperClass {}
+    public abstract class NestedIImpl implements NestedInI<NestedInSuperClass> {}
+
+    public NestedIImpl getImpl() { return null; }
+    public NestedSubClass getNestedSubClass() { return null; }
+}
+
+// FILE: K2.kt
+open class KFirst : SuperClass<String>(), SuperI<Int>
+
+// FILE: K3.kt
+abstract class SuperClass<T> {
+    inner open class NestedInSuperClass {
+        fun nested(x: T) {}
+    }
+}
+
+interface SuperI<E> {
+    interface NestedInI<F> {
+        fun nestedI(f: F) {}
+    }
+}
+
+// FIR_IDENTICAL
+// !DIAGNOSTICS: -UNUSED_PARAMETER
+
+import kotlin.reflect.KProperty
+
+operator fun Any.getValue(x: Any?, y: Any): Any = null!!
+
+class C {
+    val x by 1
+    val `$$delegatedProperties`: Array<KProperty<*>> = null!!
+}
+
+class C2 {
+    val x by 1
+    lateinit var `$$delegatedProperties`: Array<KProperty<*>>
+}
+
+val x by 1
+lateinit var `$$delegatedProperties`: Array<KProperty<*>>
+fun foo() {
+    val inv = {{}}<!NOT_NULL_ASSERTION_ON_LAMBDA_EXPRESSION!>!!<!>
+    val bar = {{}}
+}
+
+/*
+ * Copyright 2010-2017 JetBrains s.r.o.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package org.jetbrains.kotlin.ir.util
+
+import org.jetbrains.kotlin.descriptors.DeclarationDescriptor
+import org.jetbrains.kotlin.ir.ObsoleteDescriptorBasedAPI
+import org.jetbrains.kotlin.ir.IrElement
+import org.jetbrains.kotlin.ir.declarations.*
+import org.jetbrains.kotlin.ir.expressions.IrCall
+import org.jetbrains.kotlin.ir.expressions.IrReturnableBlock
+import org.jetbrains.kotlin.ir.symbols.*
+import org.jetbrains.kotlin.ir.symbols.impl.*
+import org.jetbrains.kotlin.ir.visitors.IrElementVisitorVoid
+import org.jetbrains.kotlin.ir.visitors.acceptChildrenVoid
+
+@OptIn(ObsoleteDescriptorBasedAPI::class)
+open class DeepCopySymbolRemapper(
+    private val descriptorsRemapper: DescriptorsRemapper = NullDescriptorsRemapper
+) : IrElementVisitorVoid, SymbolRemapper {
+
+    protected val classes = hashMapOf<IrClassSymbol, IrClassSymbol>()
+    protected val scripts = hashMapOf<IrScriptSymbol, IrScriptSymbol>()
+    protected val constructors = hashMapOf<IrConstructorSymbol, IrConstructorSymbol>()
+    protected val enumEntries = hashMapOf<IrEnumEntrySymbol, IrEnumEntrySymbol>()
+    protected val externalPackageFragments = hashMapOf<IrExternalPackageFragmentSymbol, IrExternalPackageFragmentSymbol>()
+    protected val fields = hashMapOf<IrFieldSymbol, IrFieldSymbol>()
+    protected val files = hashMapOf<IrFileSymbol, IrFileSymbol>()
+    protected val functions = hashMapOf<IrSimpleFunctionSymbol, IrSimpleFunctionSymbol>()
+    protected val properties = hashMapOf<IrPropertySymbol, IrPropertySymbol>()
+    protected val returnableBlocks = hashMapOf<IrReturnableBlockSymbol, IrReturnableBlockSymbol>()
+    protected val typeParameters = hashMapOf<IrTypeParameterSymbol, IrTypeParameterSymbol>()
+    protected val valueParameters = hashMapOf<IrValueParameterSymbol, IrValueParameterSymbol>()
+    protected val variables = hashMapOf<IrVariableSymbol, IrVariableSymbol>()
+    protected val localDelegatedProperties = hashMapOf<IrLocalDelegatedPropertySymbol, IrLocalDelegatedPropertySymbol>()
+    protected val typeAliases = hashMapOf<IrTypeAliasSymbol, IrTypeAliasSymbol>()
+
+    override fun visitElement(element: IrElement) {
+        element.acceptChildrenVoid(this)
+    }
+
+    protected inline fun <D : DeclarationDescriptor, B : IrSymbolOwner, reified S : IrBindableSymbol<D, B>>
+            remapSymbol(map: MutableMap<S, S>, owner: B, createNewSymbol: (S) -> S) {
+        val symbol = owner.symbol as S
+        map[symbol] = createNewSymbol(symbol)
+    }
+
+    override fun visitClass(declaration: IrClass) {
+        remapSymbol(classes, declaration) {
+            IrClassSymbolImpl(descriptorsRemapper.remapDeclaredClass(it.descriptor))
+        }
+        super.visitClass(declaration)
+    }
+
+    override fun visitScript(declaration: IrScript) {
+        remapSymbol(scripts, declaration) {
+            IrScriptSymbolImpl(descriptorsRemapper.remapDeclaredScript(it.descriptor))
+        }
+        super.visitScript(declaration)
+    }
+
+    override fun visitConstructor(declaration: IrConstructor) {
+        remapSymbol(constructors, declaration) {
+            IrConstructorSymbolImpl(descriptorsRemapper.remapDeclaredConstructor(it.descriptor))
+        }
+        super.visitConstructor(declaration)
+    }
+
+    override fun visitEnumEntry(declaration: IrEnumEntry) {
+        remapSymbol(enumEntries, declaration) {
+            IrEnumEntrySymbolImpl(descriptorsRemapper.remapDeclaredEnumEntry(it.descriptor))
+        }
+        super.visitEnumEntry(declaration)
+    }
+
+    override fun visitExternalPackageFragment(declaration: IrExternalPackageFragment) {
+        remapSymbol(externalPackageFragments, declaration) {
+            IrExternalPackageFragmentSymbolImpl(descriptorsRemapper.remapDeclaredExternalPackageFragment(it.descriptor))
+        }
+        super.visitExternalPackageFragment(declaration)
+    }
+
+    override fun visitField(declaration: IrField) {
+        remapSymbol(fields, declaration) {
+            IrFieldSymbolImpl(descriptorsRemapper.remapDeclaredField(it.descriptor))
+        }
+        super.visitField(declaration)
+    }
+
+    override fun visitFile(declaration: IrFile) {
+        remapSymbol(files, declaration) {
+            IrFileSymbolImpl(descriptorsRemapper.remapDeclaredFilePackageFragment(it.descriptor))
+        }
+        super.visitFile(declaration)
+    }
+
+    override fun visitSimpleFunction(declaration: IrSimpleFunction) {
+        remapSymbol(functions, declaration) {
+            IrSimpleFunctionSymbolImpl(descriptorsRemapper.remapDeclaredSimpleFunction(it.descriptor))
+        }
+        super.visitSimpleFunction(declaration)
+    }
+
+    override fun visitProperty(declaration: IrProperty) {
+        remapSymbol(properties, declaration) {
+            IrPropertySymbolImpl(descriptorsRemapper.remapDeclaredProperty(it.descriptor))
+        }
+        super.visitProperty(declaration)
+    }
+
+    override fun visitTypeParameter(declaration: IrTypeParameter) {
+        remapSymbol(typeParameters, declaration) {
+            IrTypeParameterSymbolImpl(descriptorsRemapper.remapDeclaredTypeParameter(it.descriptor))
+        }
+        super.visitTypeParameter(declaration)
+    }
+
+    override fun visitValueParameter(declaration: IrValueParameter) {
+        remapSymbol(valueParameters, declaration) {
+            IrValueParameterSymbolImpl(descriptorsRemapper.remapDeclaredValueParameter(it.descriptor))
+        }
+        super.visitValueParameter(declaration)
+    }
+
+    override fun visitVariable(declaration: IrVariable) {
+        remapSymbol(variables, declaration) {
+            IrVariableSymbolImpl(descriptorsRemapper.remapDeclaredVariable(it.descriptor))
+        }
+        super.visitVariable(declaration)
+    }
+
+    override fun visitLocalDelegatedProperty(declaration: IrLocalDelegatedProperty) {
+        remapSymbol(localDelegatedProperties, declaration) {
+            IrLocalDelegatedPropertySymbolImpl(descriptorsRemapper.remapDeclaredLocalDelegatedProperty(it.descriptor))
+        }
+        super.visitLocalDelegatedProperty(declaration)
+    }
+
+    override fun visitTypeAlias(declaration: IrTypeAlias) {
+        remapSymbol(typeAliases, declaration) {
+            IrTypeAliasSymbolImpl(descriptorsRemapper.remapDeclaredTypeAlias(it.descriptor))
+        }
+        super.visitTypeAlias(declaration)
+    }
+
+    override fun visitReturnableBlock(expression: IrReturnableBlock) {
+        remapSymbol(returnableBlocks, expression) {
+            IrReturnableBlockSymbolImpl()
+        }
+        super.visitReturnableBlock(expression)
+    }
+
+    private fun <T : IrSymbol> Map<T, T>.getDeclared(symbol: T) =
+        getOrElse(symbol) {
+            throw IllegalArgumentException("Non-remapped symbol $symbol")
+        }
+
+    private fun <T : IrSymbol> Map<T, T>.getReferenced(symbol: T) =
+        getOrElse(symbol) { symbol }
+
+    override fun getDeclaredClass(symbol: IrClassSymbol): IrClassSymbol = classes.getDeclared(symbol)
+
+    override fun getDeclaredAnonymousInitializer(symbol: IrAnonymousInitializerSymbol): IrAnonymousInitializerSymbol =
+        IrAnonymousInitializerSymbolImpl(symbol.owner.descriptor)
+
+    override fun getDeclaredScript(symbol: IrScriptSymbol): IrScriptSymbol = scripts.getDeclared(symbol)
+    override fun getDeclaredSimpleFunction(symbol: IrSimpleFunctionSymbol): IrSimpleFunctionSymbol = functions.getDeclared(symbol)
+    override fun getDeclaredProperty(symbol: IrPropertySymbol): IrPropertySymbol = properties.getDeclared(symbol)
+    override fun getDeclaredField(symbol: IrFieldSymbol): IrFieldSymbol = fields.getDeclared(symbol)
+    override fun getDeclaredFile(symbol: IrFileSymbol): IrFileSymbol = files.getDeclared(symbol)
+    override fun getDeclaredConstructor(symbol: IrConstructorSymbol): IrConstructorSymbol = constructors.getDeclared(symbol)
+    override fun getDeclaredEnumEntry(symbol: IrEnumEntrySymbol): IrEnumEntrySymbol = enumEntries.getDeclared(symbol)

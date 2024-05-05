@@ -1,0 +1,100 @@
+        thisClass?.let {
+        var sum = 0.0
+        for (item in data.asSequence().filter { filterLoad(it) })
+            elements.getPackageElement(fqName)?.let { symbol ->
+        if (expression != null) {
+        readByte().toUByte()
+        KtPsiBasedSymbolPointer.createForSymbolFromSource<KtClassInitializerSymbol>(this)?.let { return it }
+        if (isJsImplicitExport()) return true
+            javaProtectedField
+    abstract fun referenceConstructor(declaration: Constructor): IrConstructorSymbol
+    if (size > 1) sortArray(this, 0, size)
+    condition -> x = ""
+        else this.invokeSuspendSuperTypeWithReceiver(receiver, completion)
+}
+        FirTowerDataElement(
+    return when (val originalVisibility = originalDescriptor.visibility) {
+                }
+        (thisRef as? Foo)?.a ?: default
+    when (value_1) {
+}
+    val suitableGroups = kotlinCInteropGroups.await().filter { group ->
+    return return if (z1 && z2) "OK" else "fail"
+fun <A: Boolean?, B: Double?> eqBooleanQDoubleQ(a: A, b: B) = a == b
+        name: Name,
+    with(listOf(1, 2, 3)) {
+        <!DEBUG_INFO_EXPRESSION_TYPE("T & T & Any")!>x<!>.funNullableAny()
+    val start = node.firstChildNode.textLength
+        transformer.declarationsTransformer?.context?.withContainingClass(firClass) {
+    <!NO_ELSE_IN_WHEN!>when<!> (x) {
+    if (result1.x != "original+argument+42") return "Fail first"
+        testReadLine("", emptyList())
+fun test3(x: Outer.NestedAlias) = x
+        FromZipMetadataLibraryImpl(this, zipFileSystem)
+        val fieldType = typeMapper.mapType(field)
+        properties[key]?.let { it as T }
+        memScoped {
+    c.startCoroutine(EmptyContinuation)
+        return TypeVariableForCallableReferenceReturnType(
+            <!DEBUG_INFO_EXPRESSION_TYPE("T & Any")!>it<!>.funAny()
+            <!DEBUG_INFO_EXPRESSION_TYPE("T & Any")!>it<!>.funNullableT()
+    override fun hashCode() = typeHashcode()
+        isPurePushOfSize2() ||
+    }
+}
+}
+        if (rightType != CompileTimeType.FLOAT && rightType != CompileTimeType.DOUBLE && (opr2 as? Number)?.toInt() == 0) {
+    val root = Locale.ROOT
+}
+}
+        projectId: ProjectId,
+        compileKotlin("source.kt", File(tmpdir, "usage.js"), listOf(compileJsLibrary("library")), K2JSCompiler())
+        """
+}
+        visitVariable(errorProperty, data)
+    try {
+        assert(classCursor.kind == CXCursorKind.CXCursor_ObjCInterfaceDecl) { classCursor.kind }
+    val a = <!NO_COMPANION_OBJECT!>Test<!><!UNEXPECTED_SAFE_CALL!>?.<!>FOO
+        @Suppress("UNCHECKED_CAST")
+        result += "log($value);"
+    box.value.length
+    operator fun <T> T.provideDelegate(thisRef: Any?, prop: Any?): Box<T> = Box(this)
+                      fun f(block: (@Composable () -> Unit)? = null) {}
+        if (regex != null && !functionDescriptor.name.asString().matches(regex)) return false
+        <!DEBUG_INFO_EXPRESSION_TYPE("InterfaceWithTwoTypeParameters<in T, in T>? & InterfaceWithTwoTypeParameters<in T, in T>")!>x<!>.funAny()
+}
+    while (true) {
+        contextReceivers.transformInplace(transformer, data)
+    Protected().baz()
+    }
+    return Foo.id("OK" as java.lang.String)!! as kotlin.String
+    A<caret>A::foo
+    if (JavaBase().foo(0.toUInt()) != 42) return "Fail 1"
+    if (wrap1("") != null) throw AssertionError()
+    val sum = sum(x, y)
+                firDeclaration.lazyResolveToPhaseByDirective(phase, testServices)
+            method.isInit && method.parameters.isEmpty()
+        return s
+        AnalysisApiFirLibraryBinaryDecompiledTestConfigurator.configureTest(builder, disposable)
+    val a = A(0)
+}
+    override fun getDeclaredExternalPackageFragment(symbol: IrExternalPackageFragmentSymbol): IrExternalPackageFragmentSymbol =
+    return doNothing2(a, { x -> doNothing1(x)})
+    return object : DemoInterface {
+    val midPoint = (size / 2) - 1
+    val x = foo<@Anno Int, <!UNSUPPORTED("annotations on an underscored type argument")!>@Anno<!> _> { it.toFloat() }
+        `test compilations multiplatformStructure configuration`(kotlin.js(IR).compilations.main)
+    <!DEBUG_INFO_EXPRESSION_TYPE("kotlin.collections.MutableCollection<out kotlin.Nothing?>? & kotlin.collections.MutableCollection<out kotlin.Nothing?>")!>x<!>.funAny()
+    check<Boolean>("Boolean")
+    var result = "fail"
+                parameter: ValueParameterDescriptor,
+            if (this.name == name) {
+        if (1 != s?.length) "A" else "B"
+    return Foo<String>(42.0).x
+            name.replaceFirstChar {
+fun nullToNotNullI(aa: Any?) = aa as? II
+        override fun openInputStream(): InputStream {
+    val d: dynamic = bar
+        FirStandaloneServiceRegistrar.registerProjectModelServices(project, testServices.testConfiguration.rootDisposable)
+}
+            compilationsWithCompileOnlyDependencies: List<CompilationDependenciesPair>,
